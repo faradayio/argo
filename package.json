@@ -1,0 +1,18 @@
+{
+  "name": "argo",
+  "version": "1.1.0",
+  "description": "Batch reverse-geocode a csv using Mapzen's Pelias service",
+  "main": "argo.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "bill@faraday.io",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^1.5.2",
+    "fast-csv": "^1.0.0",
+    "function-rate-limit": "^1.0.1",
+    "request": "^2.67.0",
+    "through2-concurrent": "^1.1.0"
+  }
+}
