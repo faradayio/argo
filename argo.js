@@ -34,7 +34,6 @@ var getAddress = rateLimit(limit, 1000, function (point, callback, attempts) {
     } else {
       body = JSON.parse(body);
       var featurePoint = body.features[0].properties;
-      console.log(featurePoint.name);
       point['mz_house_number'] = featurePoint.housenumber;
       point['mz_hnst'] = featurePoint.name;
       point['mz_city'] = featurePoint.locality;
@@ -42,6 +41,24 @@ var getAddress = rateLimit(limit, 1000, function (point, callback, attempts) {
       point['mz_confidence'] = featurePoint.confidence;
       point['mz_distance'] = featurePoint.distance;
       point['mz_source'] = featurePoint.source;
+      if (body.features[1]) {
+        var featurePoint2 = body.features[1].properties;
+        point['mz_backup_house_number'] = featurePoint2.housenumber;
+        point['mz_backup_hnst'] = featurePoint2.name;
+        point['mz_backup_city'] = featurePoint2.locality;
+        point['mz_backup_state'] = featurePoint2.region_a;
+        point['mz_backup_confidence'] = featurePoint2.confidence;
+        point['mz_backup_distance'] = featurePoint2.distance;
+        point['mz_backup_source'] = featurePoint2.source;
+      } else {
+        point['mz_backup_house_number'] = '';
+        point['mz_backup_hnst'] = '';
+        point['mz_backup_city'] = '';
+        point['mz_backup_state'] = '';
+        point['mz_backup_confidence'] = '';
+        point['mz_backup_distance'] = '';
+        point['mz_backup_source'] = '';
+      }
       callback(null, point);
     }
   })
