@@ -6,7 +6,7 @@ var request = require('request');
 var rateLimit = require('function-rate-limit');
 
 // params
-var urlBase = 'https://search.mapzen.com/v1/reverse?sources=oa&api_key=';
+var urlBase = 'https://search.mapzen.com/v1/reverse?layers=address&sources=oa,osm&api_key=';
 var limit = 6;
 var inputFile = process.argv[2];
 var outputFile = process.argv[3];
