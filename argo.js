@@ -19,7 +19,7 @@ var interval = setInterval(function(){
   console.log('successes: ' + successes + ' - failures: ' + failures);
 }, 10000);
 
-var getAddress = rateLimit(1000, 1000, function (point, callback, attempts) {
+var getAddress = rateLimit(limit, 1000, function (point, callback, attempts) {
   attempts = attempts || 0;
   if (attempts === 5) {
     failures++;
