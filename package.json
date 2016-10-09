@@ -1,6 +1,6 @@
 {
   "name": "argo",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "Batch reverse-geocode a csv using Mapzen's Pelias service",
   "main": "argo.js",
   "scripts": {
@@ -10,9 +10,27 @@
   "license": "MIT",
   "dependencies": {
     "async": "^1.5.2",
+    "command-line-args": "^3.0.1",
     "fast-csv": "^1.0.0",
     "function-rate-limit": "^1.0.1",
     "request": "^2.67.0",
     "through2-concurrent": "^1.1.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/faradayio/argo.git"
+  },
+  "keywords": [
+    "map",
+    "mapzen",
+    "reverse",
+    "geocode"
+  ],
+  "bin": {
+    "argo": "argo.js"
+  },
+  "bugs": {
+    "url": "https://github.com/faradayio/argo/issues"
+  },
+  "homepage": "https://github.com/faradayio/argo#readme"
 }

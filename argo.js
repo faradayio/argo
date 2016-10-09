@@ -4,14 +4,33 @@ var through2Concurrent = require('through2-concurrent');
 var csv = require('fast-csv');
 var request = require('request');
 var rateLimit = require('function-rate-limit');
+var commandLineArgs = require('command-line-args')
 
+let optionDefinitions = [
+  { name: 'input', alias: 'i', type: String },
+  { name: 'output', alias: 'o', type: String },
+  { name: 'auth', alias: 'a', type: String },
+  { name: 'rate', alias: 'r', type: Number, defaultValue: 6 },
+  { name: 'latitudefield', alias: 'n', type: String, defaultValue: 'latitude'},
+  { name: 'longitudefield', alias: 'w', type: String, defaultValue: 'longitude'},
+]
+
+let options = commandLineArgs(optionDefinitions)
+
+if (options.input) {
+  console.log('Processing ' + options.input)
+} else {
+  console.log('Please specify an input file')
+  exit()
+}
 // params
 var urlBase = 'https://search.mapzen.com/v1/reverse?layers=address&sources=oa,osm&api_key=';
-var limit = 6;
-var inputFile = process.argv[2];
-var outputFile = process.argv[3];
-var mzKey = process.argv[4];
-
+var limit = options.rate
+var inputFile = options.input
+var outputFile = options.output || 'out_' + inputFile
+var latField = output.latitudefield
+var lonField = output.longitudefield
+var mzKey = options.auth
 var failures = 0;
 var successes = 0;
 
@@ -27,7 +46,7 @@ var getAddress = rateLimit(limit, 1000, function (point, callback, attempts) {
     callback();
   }
 
-  request(urlBase + mzKey + '&point.lat=' + point.latitude + '&point.lon=' + point.longitude, function (error, response, body) {
+  request(urlBase + mzKey + '&point.lat=' + point[latField]+ '&point.lon=' + point[lonField], function (error, response, body) {
     if (error) {
       console.error('encountered error', error instanceof Error ? error.stack : error);
       getAddress(point, callback, attempts + 1);
