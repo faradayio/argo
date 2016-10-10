@@ -34,8 +34,8 @@ var urlBase = 'https://search.mapzen.com/v1/reverse?layers=address&sources=oa,os
 var limit = options.rate
 var inputFile = options.input
 var outputFile = options.output || 'out_' + inputFile
-var latField = output.latitudefield
-var lonField = output.longitudefield
+var latField = options.latitudefield
+var lonField = options.longitudefield
 var mzKey = options.auth
 var failures = 0;
 var successes = 0;
@@ -63,16 +63,28 @@ var getAddress = rateLimit(limit, 1000, function (point, callback, attempts) {
       getAddress(point, callback, attempts + 1);
     } else {
       body = JSON.parse(body);
-      var featurePoint = body.features[0].properties;
-      point['mz_house_number'] = featurePoint.housenumber;
-      point['mz_hnst'] = featurePoint.name;
-      point['mz_city'] = featurePoint.locality || featurePoint.localadmin || '';
-      point['mz_state'] = featurePoint.region_a;
-      point['mz_zip'] = featurePoint.postalcode || '';
-      point['mz_label'] = featurePoint.label;
-      point['mz_confidence'] = featurePoint.confidence;
-      point['mz_distance'] = featurePoint.distance;
-      point['mz_source'] = featurePoint.source;
+      if (body.features[0]) {
+        var featurePoint = body.features[0].properties;
+        point['mz_house_number'] = featurePoint.housenumber;
+        point['mz_hnst'] = featurePoint.name;
+        point['mz_city'] = featurePoint.locality || featurePoint.localadmin || '';
+        point['mz_state'] = featurePoint.region_a;
+        point['mz_zip'] = featurePoint.postalcode || '';
+        point['mz_label'] = featurePoint.label;
+        point['mz_confidence'] = featurePoint.confidence;
+        point['mz_distance'] = featurePoint.distance;
+        point['mz_source'] = featurePoint.source;
+      } else {
+        point['mz_house_number'] = '';
+        point['mz_hnst'] = '';
+        point['mz_city'] = '';
+        point['mz_state'] = '';
+        point['mz_zip'] = '';
+        point['mz_label'] = '';
+        point['mz_confidence'] = '';
+        point['mz_distance'] = '';
+        point['mz_source'] = '';
+      }
       if (body.features[1]) {
         var featurePoint2 = body.features[1].properties;
         point['mz_backup_house_number'] = featurePoint2.housenumber;
