@@ -1,6 +1,6 @@
 {
   "name": "argo-geo",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Rapid reverse-geocoding using Mapzen Search",
   "main": "argo.js",
   "scripts": {
