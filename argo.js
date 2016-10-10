@@ -23,6 +23,12 @@ if (options.input) {
   console.log('Please specify an input file')
   exit()
 }
+if (options.auth) {
+  console.log('*******************************')
+} else {
+  console.log('Please specify a Mapzen authorization key. Get one here: https://mapzen.com/developers/')
+  exit()
+}
 // params
 var urlBase = 'https://search.mapzen.com/v1/reverse?layers=address&sources=oa,osm&api_key=';
 var limit = options.rate
