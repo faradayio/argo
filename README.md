@@ -4,7 +4,7 @@ A module for rapidly [reverse-geocoding using Mapzen Search](https://mapzen.com/
 ![argo](boat.jpg)
 
 ### Installation
-`npm install argo -g`
+`npm install argo-geo -g`
 
 ### Usage
 `argo -i <input filename> -a <mapzen search key> -o <output filename> `
