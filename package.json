@@ -1,6 +1,6 @@
 {
   "name": "argo-geo",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Batch reverse-geocode a csv using Mapzen's Pelias service",
   "main": "argo.js",
   "scripts": {

@@ -1,10 +1,12 @@
-// USAGE: node argo.js <input filename> <output filename> <mapzen search key>
-var fs = require('fs');
-var through2Concurrent = require('through2-concurrent');
-var csv = require('fast-csv');
-var request = require('request');
-var rateLimit = require('function-rate-limit');
-var commandLineArgs = require('command-line-args')
+#!/usr/bin/env node
+
+"use strict"
+let fs = require('fs');
+let through2Concurrent = require('through2-concurrent');
+let csv = require('fast-csv');
+let request = require('request');
+let rateLimit = require('function-rate-limit');
+let commandLineArgs = require('command-line-args')
 
 let optionDefinitions = [
   { name: 'input', alias: 'i', type: String },
@@ -30,24 +32,23 @@ if (options.auth) {
   exit()
 }
 // params
-var urlBase = 'https://search.mapzen.com/v1/reverse?layers=address&sources=oa,osm&api_key=';
-var limit = options.rate
-var inputFile = options.input
-var outputFile = options.output || 'out_' + inputFile
-var latField = options.latitudefield
-var lonField = options.longitudefield
-var mzKey = options.auth
-var failures = 0;
-var successes = 0;
+let urlBase = 'https://search.mapzen.com/v1/reverse?layers=address&sources=oa,osm&api_key=';
+let limit = options.rate
+let inputFile = options.input
+let outputFile = options.output || 'out_' + inputFile
+let latField = options.latitudefield
+let lonField = options.longitudefield
+let mzKey = options.auth
+let failures = 0;
+let successes = 0;
 
-var interval = setInterval(function(){
-  console.log('successes: ' + successes + ' - failures: ' + failures);
+let interval = setInterval(function(){
+  console.log('matched: ' + successes + ' - unmatched: ' + failures);
 }, 10000);
 
-var getAddress = rateLimit(limit, 1000, function (point, callback, attempts) {
+let getAddress = rateLimit(limit, 1000, function (point, callback, attempts) {
   attempts = attempts || 0;
   if (attempts === 5) {
-    failures++;
     console.log('Failed after 5 attempts :(', point);
     callback();
   }
@@ -64,7 +65,7 @@ var getAddress = rateLimit(limit, 1000, function (point, callback, attempts) {
     } else {
       body = JSON.parse(body);
       if (body.features[0]) {
-        var featurePoint = body.features[0].properties;
+        let featurePoint = body.features[0].properties;
         point['mz_house_number'] = featurePoint.housenumber;
         point['mz_hnst'] = featurePoint.name;
         point['mz_city'] = featurePoint.locality || featurePoint.localadmin || '';
@@ -74,6 +75,7 @@ var getAddress = rateLimit(limit, 1000, function (point, callback, attempts) {
         point['mz_confidence'] = featurePoint.confidence;
         point['mz_distance'] = featurePoint.distance;
         point['mz_source'] = featurePoint.source;
+        successes++;
       } else {
         point['mz_house_number'] = '';
         point['mz_hnst'] = '';
@@ -84,9 +86,10 @@ var getAddress = rateLimit(limit, 1000, function (point, callback, attempts) {
         point['mz_confidence'] = '';
         point['mz_distance'] = '';
         point['mz_source'] = '';
+        failures++;
       }
       if (body.features[1]) {
-        var featurePoint2 = body.features[1].properties;
+        let featurePoint2 = body.features[1].properties;
         point['mz_backup_house_number'] = featurePoint2.housenumber;
         point['mz_backup_hnst'] = featurePoint2.name;
         point['mz_backup_city'] = featurePoint2.locality || featurePoint2.localadmin || '';
@@ -108,7 +111,6 @@ var getAddress = rateLimit(limit, 1000, function (point, callback, attempts) {
         point['mz_backup_source'] = '';
       }
       callback(null, point);
-      successes++;
     }
   })
 });
@@ -124,5 +126,6 @@ csv
   .pipe(csv.createWriteStream({headers: true}))
   .pipe(fs.createWriteStream(outputFile))
   .on('finish', function(){
+    console.log('Finished reverse geocoding file "' + outputFile + '"')
     clearInterval(interval);
   });
