@@ -15,9 +15,23 @@ let optionDefinitions = [
   { name: 'rate', alias: 'r', type: Number, defaultValue: 6 },
   { name: 'latitudefield', alias: 'n', type: String, defaultValue: 'latitude'},
   { name: 'longitudefield', alias: 'w', type: String, defaultValue: 'longitude'},
+  { name: 'pois', alias: 'p', type: Boolean}
 ]
 
 let options = commandLineArgs(optionDefinitions)
+
+// params
+let urlBase = 'https://search.mapzen.com/v1/reverse?api_key=';
+let limit = options.rate
+let inputFile = options.input
+let outputFile = options.output || 'out_' + inputFile
+let latField = options.latitudefield
+let lonField = options.longitudefield
+let mzKey = options.auth
+let layerTypes = 'address'
+let sourceTypes = 'oa,osm'
+let failures = 0;
+let successes = 0;
 
 if (options.input) {
   console.log('Processing ' + options.input)
@@ -31,16 +45,10 @@ if (options.auth) {
   console.log('Please specify a Mapzen authorization key. Get one here: https://mapzen.com/developers/')
   exit()
 }
-// params
-let urlBase = 'https://search.mapzen.com/v1/reverse?layers=address&sources=oa,osm&api_key=';
-let limit = options.rate
-let inputFile = options.input
-let outputFile = options.output || 'out_' + inputFile
-let latField = options.latitudefield
-let lonField = options.longitudefield
-let mzKey = options.auth
-let failures = 0;
-let successes = 0;
+if (options.pois) {
+  layerTypes = 'venue,address,neighbourhood,microhood'
+  sourceTypes = 'oa,osm,wof'
+}
 
 let interval = setInterval(function(){
   console.log('matched: ' + successes + ' - unmatched: ' + failures);
@@ -53,7 +61,9 @@ let getAddress = rateLimit(limit, 1000, function (point, callback, attempts) {
     callback();
   }
 
-  request(urlBase + mzKey + '&point.lat=' + point[latField]+ '&point.lon=' + point[lonField], function (error, response, body) {
+  let urlThis = urlBase + mzKey + '&layers=' + layerTypes + '&sources=' + sourceTypes + '&point.lat=' + point[latField]+ '&point.lon=' + point[lonField];
+  
+  request(urlThis, function (error, response, body) {
     if (error) {
       console.error('encountered error', error instanceof Error ? error.stack : error);
       getAddress(point, callback, attempts + 1);
@@ -75,6 +85,7 @@ let getAddress = rateLimit(limit, 1000, function (point, callback, attempts) {
         point['mz_confidence'] = featurePoint.confidence;
         point['mz_distance'] = featurePoint.distance;
         point['mz_source'] = featurePoint.source;
+        point['mz_layer'] = featurePoint.layer;
         successes++;
       } else {
         point['mz_house_number'] = '';
@@ -86,6 +97,7 @@ let getAddress = rateLimit(limit, 1000, function (point, callback, attempts) {
         point['mz_confidence'] = '';
         point['mz_distance'] = '';
         point['mz_source'] = '';
+        point['mz_layer'] = '';
         failures++;
       }
       if (body.features[1]) {
@@ -99,6 +111,8 @@ let getAddress = rateLimit(limit, 1000, function (point, callback, attempts) {
         point['mz_backup_confidence'] = featurePoint2.confidence;
         point['mz_backup_distance'] = featurePoint2.distance;
         point['mz_backup_source'] = featurePoint2.source;
+        point['mz_backup_layer'] = featurePoint2.layer;
+        
       } else {
         point['mz_backup_house_number'] = '';
         point['mz_backup_hnst'] = '';
@@ -109,6 +123,7 @@ let getAddress = rateLimit(limit, 1000, function (point, callback, attempts) {
         point['mz_backup_confidence'] = '';
         point['mz_backup_distance'] = '';
         point['mz_backup_source'] = '';
+        point['mz_backup_layer'] = '';
       }
       callback(null, point);
     }
