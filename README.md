@@ -16,6 +16,7 @@ Rapid [reverse-geocoding using Mapzen Search](https://mapzen.com/documentation/s
 * `-r, --rate` (_OPTIONAL_) Number of requests per second (default = 6)
 * `-n, --latitudefield` (_OPTIONAL_) Name of column containing latitude coordinates (default = 'latitude')
 * `-w, --longitudefield` (_OPTIONAL_) Name of column containing longitude coordinates (default = 'longitude')
+* `-p, --pois` (_OPTIONAL_) Include POI results from [Who's on first](https://whosonfirst.mapzen.com/) instead of just addresses (default = false)
 
 ### Notes
 * Expects input columns `latitude` and `longitude` - if this is not the case, use `-n` and `-w` to specify coordinate column names.
